@@ -9,6 +9,8 @@
   --bg-body: #020617;
 }
 
+/* Por defecto no se aplica la clase light ni dark, usamos :root para el modo oscuro.
+   Las clases .light y .dark solo se añaden cuando se cambia el tema. */
 .light {
   --glass-bg: rgba(255, 255, 255, 0.85);
   --glass-border: rgba(203, 213, 225, 0.7);

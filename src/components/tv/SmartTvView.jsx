@@ -8,7 +8,7 @@ import {
 
 export default function SmartTvView() {
   const { totalWatts, tvFocusIndex, setTvFocusIndex, tvFocusKeys, speak, devices, watchEcoMode, toggleDevice } = useEcoPulse();
-  const [tvMode, setTvMode] = useState('home');
+  const [tvMode, setTvMode] = useState('home'); // 'home', 'cameras', 'music'
 
   const focusCard = (idx) => {
     setTvFocusIndex(idx);
@@ -22,7 +22,7 @@ export default function SmartTvView() {
       <div className="relative bg-[#060b1a] rounded-3xl border-[10px] border-slate-800/80 shadow-2xl overflow-hidden"
            style={{ boxShadow: '0 0 80px rgba(16,185,129,0.08), 0 20px 60px rgba(0,0,0,0.5)' }}>
         <div className="absolute inset-0 bg-gradient-to-b from-emerald-500/5 to-transparent pointer-events-none" />
-        
+
         <div className="aspect-video p-6 flex flex-col gap-4 relative">
           {/* Barra superior TV */}
           <div className="flex items-center justify-between shrink-0">
@@ -36,6 +36,7 @@ export default function SmartTvView() {
               </div>
             </div>
             <div className="flex items-center gap-3">
+              {/* Selector de modo TV */}
               <div className="flex bg-slate-900/80 rounded-xl p-0.5 gap-1">
                 {[
                   { id: 'home', icon: Tv, label: 'Panel' },
@@ -59,7 +60,7 @@ export default function SmartTvView() {
             </div>
           </div>
 
-          {/* Contenido según modo */}
+          {/* Contenido dinámico según modo */}
           {tvMode === 'home' && (
             <div className="flex-1 min-h-0 grid grid-cols-12 gap-3">
               {/* Sidebar izquierdo con scroll */}
@@ -107,7 +108,7 @@ export default function SmartTvView() {
                   </div>
                 </div>
 
-                {/* Control rápido */}
+                {/* Control rápido (contenedor con scroll interno) */}
                 <div className="glass-card p-3 flex flex-col gap-2 flex-1 min-h-0">
                   <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider shrink-0">Control Rápido</span>
                   <div className="flex-1 overflow-y-auto space-y-1.5 pr-1">
@@ -154,7 +155,7 @@ export default function SmartTvView() {
                   ))}
                 </div>
 
-                {/* Gráfico de barras con efecto 3D */}
+                {/* Gráfico de barras con relieve 3D */}
                 <div className="flex-1 min-h-0 glass-card p-4 flex flex-col justify-between cursor-pointer"
                      onClick={() => { setTvFocusIndex(4); speak("Gráfico de consumo semanal"); }}>
                   <div className="flex justify-between items-center mb-3 shrink-0">
@@ -194,7 +195,7 @@ export default function SmartTvView() {
                   </div>
                 </div>
 
-                {/* Barra inferior */}
+                {/* Barra inferior de resumen */}
                 <div className="glass-card p-2 px-3 flex items-center justify-between text-[10px] shrink-0">
                   <div className="flex items-center gap-4">
                     <span className="text-slate-500">Hoy: <strong className="text-white">18.5 kWh</strong></span>
@@ -223,19 +224,19 @@ export default function SmartTvView() {
                   <div className="flex-1 bg-slate-950 rounded-lg flex items-center justify-center text-slate-600 text-[10px] min-h-[80px]">
                     [Vista previa]
                   </div>
-                  <span className="text-[9px] text-slate-500 mt-1 shrink-0">Grabando • Movimiento detectado</span>
+                  <span className="text-[9px] text-slate-500 mt-1 shrink-0">Grabando · Movimiento detectado</span>
                 </div>
               ))}
             </div>
           )}
 
-          {/* Modo Ambiente */}
+          {/* Modo Ambiente (música simulada) */}
           {tvMode === 'music' && (
             <div className="flex-1 flex items-center justify-center gap-8">
               <div className="text-center">
                 <Music className="w-16 h-16 text-emerald-400 mx-auto mb-4 animate-pulse" />
                 <h3 className="text-lg font-bold text-white">Sonidos de Naturaleza</h3>
-                <p className="text-xs text-slate-400 mt-2">Bosque lluvioso • Relajante</p>
+                <p className="text-xs text-slate-400 mt-2">Bosque lluvioso · Relajante</p>
                 <div className="mt-4 flex items-center justify-center gap-3">
                   <button className="p-2 rounded-full bg-slate-800 text-slate-300 hover:bg-slate-700 transition">
                     <SkipBack className="w-5 h-5" />

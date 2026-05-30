@@ -2,7 +2,6 @@ import React, { createContext, useContext, useState, useCallback, useEffect, use
 
 const EcoPulseContext = createContext();
 
-// Utilidades de localStorage
 const loadFromStorage = (key, defaultValue) => {
   try {
     const stored = localStorage.getItem(key);
@@ -16,11 +15,10 @@ const saveToStorage = (key, value) => {
   try {
     localStorage.setItem(key, JSON.stringify(value));
   } catch {
-    // ignorar errores de cuota
+    // ignorar
   }
 };
 
-// Sistema de sonido simple con Web Audio API
 function useAudioFeedback() {
   const audioCtxRef = useRef(null);
 
@@ -59,7 +57,7 @@ function useAudioFeedback() {
         osc.stop(ctx.currentTime + 0.2);
       }
     } catch (e) {
-      // ignorar si el contexto no está permitido
+      // ignorar
     }
   }, []);
 
@@ -69,10 +67,7 @@ function useAudioFeedback() {
 export function EcoPulseProvider({ children }) {
   const playSound = useAudioFeedback();
 
-  // Dispositivo actual en pantalla
   const [currentDevice, setCurrentDevice] = useState('phone');
-
-  // Autenticación
   const [isLoggedIn, setIsLoggedIn] = useState(() => loadFromStorage('eco_isLoggedIn', true));
   const [currentUser, setCurrentUser] = useState(() =>
     loadFromStorage('eco_currentUser', {
@@ -81,8 +76,6 @@ export function EcoPulseProvider({ children }) {
       role: "Padre / Administrador"
     })
   );
-
-  // Catálogo de dispositivos
   const [devices, setDevices] = useState(() =>
     loadFromStorage('eco_devices', [
       { id: 1, name: "Aire Acondicionado", watts: 1200, status: true },
@@ -92,47 +85,30 @@ export function EcoPulseProvider({ children }) {
       { id: 5, name: "Termo Eléctrico", watts: 1500, status: true },
     ])
   );
-
-  // Navegación del smartphone
   const [phoneScreen, setPhoneScreen] = useState('dashboard');
-
-  // Accesibilidad
   const [textSize, setTextSize] = useState(() => loadFromStorage('eco_textSize', 100));
   const [highContrast, setHighContrast] = useState(() => loadFromStorage('eco_highContrast', false));
   const [screenReader, setScreenReader] = useState(() => loadFromStorage('eco_screenReader', false));
   const [readerSpeech, setReaderSpeech] = useState("Asistente vocal activo. Navegue por las opciones disponibles.");
-
-  // Smart TV
   const [tvFocusIndex, setTvFocusIndex] = useState(1);
   const tvFocusKeys = ['co2', 'energy', 'water', 'camera', 'chart'];
-
-  // Smartwatch
   const [watchEcoMode, setWatchEcoMode] = useState(() => loadFromStorage('eco_watchEcoMode', false));
-
-  // Toast
   const [toastMessage, setToastMessage] = useState("");
   const [showToast, setShowToast] = useState(false);
-
-  // Modal CRUD
   const [modalOpen, setModalOpen] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [selectedDeviceId, setSelectedDeviceId] = useState(null);
   const [formName, setFormName] = useState("");
   const [formWatts, setFormWatts] = useState("");
   const [formStatus, setFormStatus] = useState(true);
-
-  // Registro
   const [regName, setRegName] = useState("");
   const [regEmail, setRegEmail] = useState("");
   const [regPassword, setRegPassword] = useState("");
   const [regRole, setRegRole] = useState("Padre / Administrador");
 
-  // ========== NUEVOS ESTADOS: TEMA Y EDICIÓN DE PERFIL ==========
+  // Tema y edición de perfil
   const [isDarkMode, setIsDarkMode] = useState(() => loadFromStorage('eco_darkMode', true));
-
-  const toggleTheme = useCallback(() => {
-    setIsDarkMode(prev => !prev);
-  }, []);
+  const toggleTheme = useCallback(() => setIsDarkMode(prev => !prev), []);
 
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [editProfileName, setEditProfileName] = useState(currentUser.name);
@@ -145,11 +121,7 @@ export function EcoPulseProvider({ children }) {
     setEditProfileRole(currentUser.role);
     setIsEditingProfile(true);
   };
-
-  const cancelEditProfile = () => {
-    setIsEditingProfile(false);
-  };
-
+  const cancelEditProfile = () => setIsEditingProfile(false);
   const saveProfile = () => {
     if (!editProfileName || !editProfileEmail) {
       triggerToast("Nombre y correo son obligatorios", 'error');
@@ -165,9 +137,8 @@ export function EcoPulseProvider({ children }) {
     setIsEditingProfile(false);
     triggerToast("Perfil actualizado correctamente.");
   };
-  // ========== FIN DE NUEVOS ESTADOS ==========
 
-  // Persistencia automática
+  // Persistencia
   useEffect(() => { saveToStorage('eco_isLoggedIn', isLoggedIn); }, [isLoggedIn]);
   useEffect(() => { saveToStorage('eco_currentUser', currentUser); }, [currentUser]);
   useEffect(() => { saveToStorage('eco_devices', devices); }, [devices]);
@@ -191,7 +162,6 @@ export function EcoPulseProvider({ children }) {
     }
   }, [showToast]);
 
-  // Consumo total con impacto Eco
   const totalWatts = (() => {
     const base = devices.reduce((sum, d) => sum + (d.status ? d.watts : 0), 0);
     return watchEcoMode ? Math.round(base * 0.7) : base;
@@ -201,7 +171,6 @@ export function EcoPulseProvider({ children }) {
     if (screenReader) setReaderSpeech(`Lector de pantalla: Seleccionado ${desc}`);
   }, [screenReader]);
 
-  // CRUD
   const openAddModal = () => {
     setEditMode(false);
     setFormName("");
@@ -210,7 +179,6 @@ export function EcoPulseProvider({ children }) {
     setModalOpen(true);
     speak("Formulario para agregar nuevo dispositivo");
   };
-
   const openEditModal = (device) => {
     setEditMode(true);
     setSelectedDeviceId(device.id);
@@ -220,7 +188,6 @@ export function EcoPulseProvider({ children }) {
     setModalOpen(true);
     speak(`Formulario para editar dispositivo ${device.name}`);
   };
-
   const saveDevice = () => {
     if (!formName || !formWatts) {
       triggerToast("Completa todos los campos obligatorios", 'error');
@@ -243,26 +210,22 @@ export function EcoPulseProvider({ children }) {
     }
     setModalOpen(false);
   };
-
   const deleteDevice = (id, name) => {
     setDevices(d => d.filter(dev => dev.id !== id));
     triggerToast(`"${name}" eliminado del catálogo.`, 'error');
     playSound('error');
   };
-
   const toggleDevice = (id, currentStatus, name) => {
     setDevices(d => d.map(dev => dev.id === id ? { ...dev, status: !dev.status } : dev));
     triggerToast(`"${name}" ${!currentStatus ? 'encendido' : 'apagado'}.`, 'toggle');
     playSound('toggle');
   };
-
   const apagarTodo = () => {
     setDevices(d => d.map(dev => ({ ...dev, status: false })));
-    triggerToast("Todos los dispositivos apagados desde el reloj.", 'toggle');
+    triggerToast("Todos los dispositivos apagados.", 'toggle');
     playSound('toggle');
   };
 
-  // Registro y login
   const handleRegister = (e) => {
     e.preventDefault();
     if (!regName || !regEmail || !regPassword) {
@@ -274,7 +237,6 @@ export function EcoPulseProvider({ children }) {
     setPhoneScreen('dashboard');
     triggerToast(`Registro de ${regName} procesado exitosamente.`);
   };
-
   const handleLogin = (method = 'password') => {
     setIsLoggedIn(true);
     setPhoneScreen('dashboard');
@@ -285,7 +247,6 @@ export function EcoPulseProvider({ children }) {
     };
     triggerToast(messages[method] || messages.password);
   };
-
   const handleLogout = () => {
     setIsLoggedIn(false);
     setPhoneScreen('login');
@@ -322,7 +283,6 @@ export function EcoPulseProvider({ children }) {
     saveDevice, deleteDevice, toggleDevice, apagarTodo,
     handleRegister, handleLogin, handleLogout,
     playSound,
-    // nuevos
     isDarkMode, toggleTheme,
     isEditingProfile,
     editProfileName, setEditProfileName,
