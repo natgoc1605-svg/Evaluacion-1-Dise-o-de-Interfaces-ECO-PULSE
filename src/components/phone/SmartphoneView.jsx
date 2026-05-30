@@ -51,17 +51,16 @@ export default function SmartphoneView() {
         </div>
       </div>
 
-      {/* Contenido con scroll */}
+      {/* Contenido con scroll oculto */}
       <div
         style={{ fontSize: `${textSize}%` }}
-        className="flex-1 min-h-0 overflow-y-auto px-3 sm:px-4 pb-16 pt-1 transition-all duration-200 scroll-smooth"
+        className="flex-1 min-h-0 overflow-y-auto px-3 sm:px-4 pb-16 pt-1 transition-all duration-200 scroll-smooth hide-scrollbar"
       >
         {renderScreen()}
       </div>
 
       {isLoggedIn && <BottomNav />}
 
-      {/* Brillo interior */}
       <div className="absolute inset-0 rounded-[40px] sm:rounded-[44px] pointer-events-none"
         style={{
           boxShadow: isDarkMode

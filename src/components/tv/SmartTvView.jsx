@@ -8,7 +8,7 @@ import {
 
 export default function SmartTvView() {
   const { totalWatts, tvFocusIndex, setTvFocusIndex, tvFocusKeys, speak, devices, watchEcoMode, toggleDevice } = useEcoPulse();
-  const [tvMode, setTvMode] = useState('home'); // 'home', 'cameras', 'music'
+  const [tvMode, setTvMode] = useState('home');
 
   const focusCard = (idx) => {
     setTvFocusIndex(idx);
@@ -19,7 +19,6 @@ export default function SmartTvView() {
 
   return (
     <div className="relative w-full max-w-[95vw] xl:max-w-6xl mx-auto">
-      {/* Contenedor responsive con aspect-ratio */}
       <div className="relative w-full bg-[#060b1a] rounded-2xl lg:rounded-3xl border-4 lg:border-[10px] border-slate-800/80 shadow-2xl overflow-hidden"
            style={{
              aspectRatio: '16 / 9',
@@ -40,7 +39,6 @@ export default function SmartTvView() {
               </div>
             </div>
             <div className="flex items-center gap-1.5 lg:gap-3">
-              {/* Selector de modo TV */}
               <div className="flex bg-slate-900/80 rounded-lg lg:rounded-xl p-0.5 gap-0.5 lg:gap-1">
                 {[
                   { id: 'home', icon: Tv, label: 'Panel' },
@@ -66,12 +64,9 @@ export default function SmartTvView() {
             </div>
           </div>
 
-          {/* Contenido dinámico */}
           {tvMode === 'home' && (
             <div className="flex-1 min-h-0 grid grid-cols-12 gap-2 lg:gap-3">
-              {/* Sidebar izquierdo */}
-              <div className="col-span-3 flex flex-col gap-2 lg:gap-3 overflow-y-auto pr-1">
-                {/* Escenas rápidas */}
+              <div className="col-span-3 flex flex-col gap-2 lg:gap-3 overflow-y-auto pr-1 hide-scrollbar">
                 <div className="glass-card p-2 lg:p-3 flex flex-col gap-1.5 lg:gap-2 shrink-0">
                   <div className="flex items-center gap-1.5 lg:gap-2">
                     <Settings className="w-3 h-3 lg:w-4 lg:h-4 text-cyan-400" />
@@ -93,7 +88,6 @@ export default function SmartTvView() {
                   </div>
                 </div>
 
-                {/* Reto semanal */}
                 <div className={`glass-card p-2 lg:p-3 flex flex-col gap-1.5 lg:gap-2 shrink-0 transition-all duration-300 cursor-pointer ${
                   tvFocusKeys[tvFocusIndex] === 'co2' ? 'ring-2 ring-emerald-500/50 glow-emerald' : 'hover:border-slate-600/50'
                 }`} onClick={() => focusCard(0)}>
@@ -114,10 +108,9 @@ export default function SmartTvView() {
                   </div>
                 </div>
 
-                {/* Control rápido */}
                 <div className="glass-card p-2 lg:p-3 flex flex-col gap-1.5 lg:gap-2 flex-1 min-h-0">
                   <span className="text-[8px] lg:text-[10px] text-slate-400 font-bold uppercase tracking-wider shrink-0">Control Rápido</span>
-                  <div className="flex-1 overflow-y-auto space-y-1 lg:space-y-1.5 pr-1">
+                  <div className="flex-1 overflow-y-auto space-y-1 lg:space-y-1.5 pr-1 hide-scrollbar">
                     {devices.map(device => (
                       <div key={device.id} className="flex items-center justify-between py-0.5 lg:py-1">
                         <span className="text-[8px] lg:text-[10px] text-slate-300">{device.name}</span>
@@ -132,9 +125,7 @@ export default function SmartTvView() {
                 </div>
               </div>
 
-              {/* Zona central */}
               <div className="col-span-9 flex flex-col gap-2 lg:gap-3 min-h-0">
-                {/* Tarjetas superiores */}
                 <div className="grid grid-cols-4 gap-1.5 lg:gap-3 shrink-0">
                   {[
                     { icon: Leaf, label: 'CO₂ Evitado', value: '42 kg', sub: 'Mejora 28%', idx: 0 },
@@ -161,7 +152,6 @@ export default function SmartTvView() {
                   ))}
                 </div>
 
-                {/* Gráfico de barras sin brillo blanco */}
                 <div className="flex-1 min-h-0 glass-card p-3 lg:p-4 flex flex-col justify-between cursor-pointer"
                      onClick={() => { setTvFocusIndex(4); speak("Gráfico de consumo semanal"); }}>
                   <div className="flex justify-between items-center mb-2 lg:mb-3 shrink-0">
@@ -197,7 +187,6 @@ export default function SmartTvView() {
                   </div>
                 </div>
 
-                {/* Barra inferior */}
                 <div className="glass-card p-1.5 lg:p-2 px-2 lg:px-3 flex items-center justify-between text-[8px] lg:text-[10px] shrink-0">
                   <div className="flex items-center gap-2 lg:gap-4">
                     <span className="text-slate-500">Hoy: <strong className="text-white">18.5 kWh</strong></span>
@@ -213,9 +202,8 @@ export default function SmartTvView() {
             </div>
           )}
 
-          {/* Modo Cámaras */}
           {tvMode === 'cameras' && (
-            <div className="flex-1 min-h-0 grid grid-cols-2 gap-2 lg:gap-3 overflow-y-auto p-1 lg:p-2">
+            <div className="flex-1 min-h-0 grid grid-cols-2 gap-2 lg:gap-3 overflow-y-auto p-1 lg:p-2 hide-scrollbar">
               {['Entrada Principal', 'Garaje', 'Jardín', 'Sala'].map((cam, i) => (
                 <div key={i} className="glass-card p-2 lg:p-3 flex flex-col">
                   <div className="flex items-center gap-1.5 lg:gap-2 mb-1 lg:mb-2 shrink-0">
@@ -232,7 +220,6 @@ export default function SmartTvView() {
             </div>
           )}
 
-          {/* Modo Ambiente */}
           {tvMode === 'music' && (
             <div className="flex-1 flex items-center justify-center gap-4 lg:gap-8">
               <div className="text-center">

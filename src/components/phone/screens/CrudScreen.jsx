@@ -28,7 +28,7 @@ export default function CrudScreen() {
         Administra los dispositivos de tu hogar inteligente.
       </p>
 
-      <div className="space-y-2 max-h-[400px] overflow-y-auto pr-1">
+      <div className="space-y-2 max-h-[400px] overflow-y-auto pr-1 hide-scrollbar">
         {devices.map(device => (
           <div
             key={device.id}

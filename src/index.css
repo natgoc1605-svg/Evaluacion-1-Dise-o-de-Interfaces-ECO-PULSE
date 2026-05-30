@@ -30,7 +30,6 @@ body {
   transition: background-color 0.3s, color 0.3s;
 }
 
-/* Clases utilitarias para vidrio */
 .glass-card {
   background-color: var(--glass-bg);
   backdrop-filter: blur(12px);
@@ -55,22 +54,19 @@ body {
   @apply bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent;
 }
 
-/* Ajustes adicionales para modo claro en textos específicos */
-.light .text-slate-500 {
-  color: #475569;
+/* Ajustes para modo claro */
+.light .text-slate-500 { color: #475569; }
+.light .text-slate-400 { color: #64748b; }
+.light .text-slate-300 { color: #334155; }
+.light .text-white { color: #0f172a; }
+.light .bg-slate-950\/80 { background-color: rgba(241, 245, 249, 0.8); }
+.light .border-slate-800\/80 { border-color: rgba(203, 213, 225, 0.8); }
+
+/* Ocultar scrollbars visualmente */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
-.light .text-slate-400 {
-  color: #64748b;
-}
-.light .text-slate-300 {
-  color: #334155;
-}
-.light .text-white {
-  color: #0f172a;
-}
-.light .bg-slate-950\/80 {
-  background-color: rgba(241, 245, 249, 0.8);
-}
-.light .border-slate-800\/80 {
-  border-color: rgba(203, 213, 225, 0.8);
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
 }
