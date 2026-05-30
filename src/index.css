@@ -9,8 +9,6 @@
   --bg-body: #020617;
 }
 
-/* Por defecto no se aplica la clase light ni dark, usamos :root para el modo oscuro.
-   Las clases .light y .dark solo se añaden cuando se cambia el tema. */
 .light {
   --glass-bg: rgba(255, 255, 255, 0.85);
   --glass-border: rgba(203, 213, 225, 0.7);
@@ -32,6 +30,7 @@ body {
   transition: background-color 0.3s, color 0.3s;
 }
 
+/* Clases utilitarias para vidrio */
 .glass-card {
   background-color: var(--glass-bg);
   backdrop-filter: blur(12px);
@@ -54,4 +53,24 @@ body {
 
 .text-gradient {
   @apply bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent;
+}
+
+/* Ajustes adicionales para modo claro en textos específicos */
+.light .text-slate-500 {
+  color: #475569;
+}
+.light .text-slate-400 {
+  color: #64748b;
+}
+.light .text-slate-300 {
+  color: #334155;
+}
+.light .text-white {
+  color: #0f172a;
+}
+.light .bg-slate-950\/80 {
+  background-color: rgba(241, 245, 249, 0.8);
+}
+.light .border-slate-800\/80 {
+  border-color: rgba(203, 213, 225, 0.8);
 }
