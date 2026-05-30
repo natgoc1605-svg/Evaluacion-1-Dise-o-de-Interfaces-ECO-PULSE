@@ -2,7 +2,25 @@ import React, { createContext, useContext, useState, useCallback, useEffect, use
 
 const EcoPulseContext = createContext();
 
-//  Sistema de sonido simple con Web Audio API
+// Utilidades de localStorage
+const loadFromStorage = (key, defaultValue) => {
+  try {
+    const stored = localStorage.getItem(key);
+    return stored ? JSON.parse(stored) : defaultValue;
+  } catch {
+    return defaultValue;
+  }
+};
+
+const saveToStorage = (key, value) => {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    // ignorar errores de cuota
+  }
+};
+
+// Sistema de sonido simple con Web Audio API
 function useAudioFeedback() {
   const audioCtxRef = useRef(null);
 
@@ -21,7 +39,6 @@ function useAudioFeedback() {
       osc.connect(gain);
       gain.connect(ctx.destination);
 
-      // Configurar tono según tipo de acción
       if (type === 'toggle') {
         osc.frequency.value = 800;
         gain.gain.setValueAtTime(0.1, ctx.currentTime);
@@ -42,38 +59,20 @@ function useAudioFeedback() {
         osc.stop(ctx.currentTime + 0.2);
       }
     } catch (e) {
-      // ignorar si el contexto no está permitido (navegador bloquea)
+      // ignorar si el contexto no está permitido
     }
   }, []);
 
   return playSound;
 }
 
-//  Datos iniciales desde localStorage
-const loadFromStorage = (key, defaultValue) => {
-  try {
-    const stored = localStorage.getItem(key);
-    return stored ? JSON.parse(stored) : defaultValue;
-  } catch {
-    return defaultValue;
-  }
-};
-
-const saveToStorage = (key, value) => {
-  try {
-    localStorage.setItem(key, JSON.stringify(value));
-  } catch {
-    // ignorar errores de cuota
-  }
-};
-
 export function EcoPulseProvider({ children }) {
   const playSound = useAudioFeedback();
 
-  // --- Dispositivo actual en pantalla ---
+  // Dispositivo actual en pantalla
   const [currentDevice, setCurrentDevice] = useState('phone');
 
-  // --- Autenticación ---
+  // Autenticación
   const [isLoggedIn, setIsLoggedIn] = useState(() => loadFromStorage('eco_isLoggedIn', true));
   const [currentUser, setCurrentUser] = useState(() =>
     loadFromStorage('eco_currentUser', {
@@ -83,7 +82,7 @@ export function EcoPulseProvider({ children }) {
     })
   );
 
-  // --- Catálogo de dispositivos ---
+  // Catálogo de dispositivos
   const [devices, setDevices] = useState(() =>
     loadFromStorage('eco_devices', [
       { id: 1, name: "Aire Acondicionado", watts: 1200, status: true },
@@ -94,27 +93,27 @@ export function EcoPulseProvider({ children }) {
     ])
   );
 
-  // --- Navegación del smartphone ---
+  // Navegación del smartphone
   const [phoneScreen, setPhoneScreen] = useState('dashboard');
 
-  // --- Accesibilidad ---
+  // Accesibilidad
   const [textSize, setTextSize] = useState(() => loadFromStorage('eco_textSize', 100));
   const [highContrast, setHighContrast] = useState(() => loadFromStorage('eco_highContrast', false));
   const [screenReader, setScreenReader] = useState(() => loadFromStorage('eco_screenReader', false));
   const [readerSpeech, setReaderSpeech] = useState("Asistente vocal activo. Navegue por las opciones disponibles.");
 
-  // --- Smart TV ---
+  // Smart TV
   const [tvFocusIndex, setTvFocusIndex] = useState(1);
   const tvFocusKeys = ['co2', 'energy', 'water', 'camera', 'chart'];
 
-  // --- Smartwatch ---
+  // Smartwatch
   const [watchEcoMode, setWatchEcoMode] = useState(() => loadFromStorage('eco_watchEcoMode', false));
 
-  // --- Toast ---
+  // Toast
   const [toastMessage, setToastMessage] = useState("");
   const [showToast, setShowToast] = useState(false);
 
-  // --- Modal CRUD ---
+  // Modal CRUD
   const [modalOpen, setModalOpen] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [selectedDeviceId, setSelectedDeviceId] = useState(null);
@@ -122,13 +121,53 @@ export function EcoPulseProvider({ children }) {
   const [formWatts, setFormWatts] = useState("");
   const [formStatus, setFormStatus] = useState(true);
 
-  // --- Registro ---
+  // Registro
   const [regName, setRegName] = useState("");
   const [regEmail, setRegEmail] = useState("");
   const [regPassword, setRegPassword] = useState("");
   const [regRole, setRegRole] = useState("Padre / Administrador");
 
-  //  Persistencia automática
+  // ========== NUEVOS ESTADOS: TEMA Y EDICIÓN DE PERFIL ==========
+  const [isDarkMode, setIsDarkMode] = useState(() => loadFromStorage('eco_darkMode', true));
+
+  const toggleTheme = useCallback(() => {
+    setIsDarkMode(prev => !prev);
+  }, []);
+
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [editProfileName, setEditProfileName] = useState(currentUser.name);
+  const [editProfileEmail, setEditProfileEmail] = useState(currentUser.email);
+  const [editProfileRole, setEditProfileRole] = useState(currentUser.role);
+
+  const startEditProfile = () => {
+    setEditProfileName(currentUser.name);
+    setEditProfileEmail(currentUser.email);
+    setEditProfileRole(currentUser.role);
+    setIsEditingProfile(true);
+  };
+
+  const cancelEditProfile = () => {
+    setIsEditingProfile(false);
+  };
+
+  const saveProfile = () => {
+    if (!editProfileName || !editProfileEmail) {
+      triggerToast("Nombre y correo son obligatorios", 'error');
+      return;
+    }
+    const updatedUser = {
+      ...currentUser,
+      name: editProfileName,
+      email: editProfileEmail,
+      role: editProfileRole,
+    };
+    setCurrentUser(updatedUser);
+    setIsEditingProfile(false);
+    triggerToast("Perfil actualizado correctamente.");
+  };
+  // ========== FIN DE NUEVOS ESTADOS ==========
+
+  // Persistencia automática
   useEffect(() => { saveToStorage('eco_isLoggedIn', isLoggedIn); }, [isLoggedIn]);
   useEffect(() => { saveToStorage('eco_currentUser', currentUser); }, [currentUser]);
   useEffect(() => { saveToStorage('eco_devices', devices); }, [devices]);
@@ -136,8 +175,8 @@ export function EcoPulseProvider({ children }) {
   useEffect(() => { saveToStorage('eco_highContrast', highContrast); }, [highContrast]);
   useEffect(() => { saveToStorage('eco_screenReader', screenReader); }, [screenReader]);
   useEffect(() => { saveToStorage('eco_watchEcoMode', watchEcoMode); }, [watchEcoMode]);
+  useEffect(() => { saveToStorage('eco_darkMode', isDarkMode); }, [isDarkMode]);
 
-  //  Función triggerToast con sonido
   const triggerToast = useCallback((msg, soundType = 'notification') => {
     setToastMessage(msg);
     setShowToast(true);
@@ -152,18 +191,17 @@ export function EcoPulseProvider({ children }) {
     }
   }, [showToast]);
 
-  // --- Consumo total con impacto Eco ---
+  // Consumo total con impacto Eco
   const totalWatts = (() => {
     const base = devices.reduce((sum, d) => sum + (d.status ? d.watts : 0), 0);
     return watchEcoMode ? Math.round(base * 0.7) : base;
   })();
 
-  // --- Lectura de accesibilidad ---
   const speak = useCallback((desc) => {
     if (screenReader) setReaderSpeech(`Lector de pantalla: Seleccionado ${desc}`);
   }, [screenReader]);
 
-  // --- CRUD ---
+  // CRUD
   const openAddModal = () => {
     setEditMode(false);
     setFormName("");
@@ -224,7 +262,7 @@ export function EcoPulseProvider({ children }) {
     playSound('toggle');
   };
 
-  // --- Registro ---
+  // Registro y login
   const handleRegister = (e) => {
     e.preventDefault();
     if (!regName || !regEmail || !regPassword) {
@@ -283,7 +321,14 @@ export function EcoPulseProvider({ children }) {
     openAddModal, openEditModal,
     saveDevice, deleteDevice, toggleDevice, apagarTodo,
     handleRegister, handleLogin, handleLogout,
-    playSound, // Exponemos la función de sonido por si se necesita
+    playSound,
+    // nuevos
+    isDarkMode, toggleTheme,
+    isEditingProfile,
+    editProfileName, setEditProfileName,
+    editProfileEmail, setEditProfileEmail,
+    editProfileRole, setEditProfileRole,
+    startEditProfile, cancelEditProfile, saveProfile,
   };
 
   return (
